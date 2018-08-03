@@ -71,3 +71,124 @@ See [plugin info](https://github.com/rabbitmq/rabbitmq-auth-backend-http)
 rabbitmq-plugins enable rabbitmq_auth_backend_http
 ````
 
+**QUESITON**: Is this needed? Is is (standrad-supported) plugin started automatically when something applies to it in config? 
+
+
+---
+#### Modifying "rabbitmq.conf"
+Added the following info (in the middle of the config-file - not sure order matters).
+
+````
+auth_backends.1 = internal
+auth_backends.2 = http
+auth_http.user_path = http://a4e947cd.ngrok.io/auth/user
+auth_http.vhost_path = http://a4e947cd.ngrok.io/auth/vhost
+auth_http.resource_path = http://a4e947cd.ngrok.io/auth/resource
+auth_http.topic_path = http://a4e947cd.ngrok.io/auth/topic
+````
+
+Remarks: 
+- URL wired because used ngrok
+- example keeps internal provider ("internal" is an alias for "rabbit_auth_backend_internal")
+- could also split authN and authZ (see [here](https://www.rabbitmq.com/access-control.html) for more examples)
+
+
+---
+#### Copying "rabbitmq.conf" file into container
+````
+docker container cp ./rabbitmq.conf container-rabbit-1:/etc/rabbitmq/rabbitmq.conf
+````
+**QUESTION**: When do this config-changes take effect?
+
+- Stop and start container seems to work: 
+  - ````docker container stop container-rabbit-1````
+  - ````docker container start container-rabbit-1````
+-  What about ````rabbitmqctl stop_app```` then ````rabbitmqctl reset```` then ````rabbitmqctl start_app````
+
+
+---
+#### WebServer implementing 'Auth-Http' needs
+
+See [here](https://github.com/rabbitmq/rabbitmq-auth-backend-http/blob/v3.7.7/README.md) what is expected by the web-server.
+
+Draft implementation (working so far only for user-requests):
+(requirest c# 7.2 at least)
+```js
+using System;
+using System.Collections.Specialized;
+using System.IO;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ConsoleAppServerMock
+{
+    internal class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            var server = new Server(new[] {"http://localhost:8080/auth/"}, ProcessRequestAsync);
+            await server.StartAsync();
+        }
+
+        private static async Task ProcessRequestAsync(HttpListenerContext context)
+        {
+            HttpListenerRequest request = context.Request;
+            Console.WriteLine("Processing new request at {0}", request.Url);
+            string body = await new StreamReader(request.InputStream).ReadToEndAsync();
+
+            NameValueCollection queryString = request.QueryString;
+            for (int i = 0; i < queryString.Count; i++)
+            {
+                Console.WriteLine("{0}={1}", queryString.GetKey(i), queryString.Get(i));
+            }
+            
+            // Response
+            byte[] buf = Encoding.UTF8.GetBytes("allow administrator");
+
+            HttpListenerResponse response = context.Response;
+            response.StatusCode = 200;
+            response.KeepAlive = false;
+            response.Headers.Add("content-type: text/html; charset=UTF-8");
+            response.Headers.Add("cache-control:no-store, no-cache, must-revalidate");
+            response.Headers.Add("pragma:no-cache");
+            response.ContentLength64 = buf.Length;
+            await response.OutputStream.WriteAsync(buf, 0, buf.Length);
+            await response.OutputStream.FlushAsync();
+            response.Close(); // documentation: "send the response data to the client by calling the Close method."
+        }
+
+        private class Server
+        {
+            private readonly string[] prefixes;
+            private readonly Func<HttpListenerContext, Task> processRequestAsync;
+
+            public Server(string[] prefixes, Func<HttpListenerContext, Task> processRequestAsync)
+            {
+                this.prefixes = prefixes;
+                this.processRequestAsync = processRequestAsync;
+            }
+
+            public async Task StartAsync()
+            {
+                HttpListener listener = new HttpListener();
+                foreach (var prefix in prefixes)
+                {
+                    listener.Prefixes.Add(prefix);
+                }
+
+                listener.Start();
+                Console.WriteLine("Server has started...");
+
+                while (listener.IsListening)
+                {
+                    var context = await listener.GetContextAsync();
+                    await processRequestAsync(context);
+                }
+            }
+        }
+    }
+}
+
+```
+   

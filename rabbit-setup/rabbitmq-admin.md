@@ -50,3 +50,28 @@ rabbitmqctl set_policy matspolicy ^amq. '{"max-length-bytes",4000}'
 
 rabbitmqctl list_policies
 ````
+
+---
+### Configuration
+Filename: **rabbitmq.conf**
+
+[Here](https://github.com/rabbitmq/rabbitmq-server/blob/master/docs/rabbitmq.conf.example) an example with almost everything in it 
+
+The active configuration file can be verified by inspecting the RabbitMQ log file. 
+It will show up in the log file at the top, along with the other broker boot log entries.
+
+RabbitMQ-image is configured to log to syslog - hence check docker container log: 
+````
+docker logs container-rabbit-1
+// config-location is listed at beginning of file, e.g.:
+//   node           : rabbit@host-rabbit-1
+//   home dir       : /var/lib/rabbitmq
+//   config file(s) : /etc/rabbitmq/rabbitmq.conf
+
+````
+
+Remark 1: Config-file location can be overridden by environment-variable. Check: ````printenv RABBITMQ_CONFIG_FILE ````
+
+Reamrk 2: Config-file location can also be found in the management UI, together with other details about nodes.
+*??? NOT FOUND ???*
+
