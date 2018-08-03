@@ -25,14 +25,26 @@ Configuration-Info: https://hub.docker.com/_/rabbitmq/
 
   // 15672 -> mgmt
   // 5672 -> regular connections to node from clients
+
+
 ````
 
-### Management:
+
+### Container-Access
+Get into container:   
+```` 
+docker container exec -it 4e21 /bin/bash
+````
 
 
+### Copy config-files
+Copy a file from container to host (and vice versa):
+````
+// copy file from container to current working directory.
+docker container cp container-rabbit-1:/etc/rabbitmq/rabbitmq.conf .
+````
 
-### Check broker
-  - get into container:   ```` docker container exec -it 4e21 /bin/bash````
-  - check status:         ````service rabbitmq-server status````
-
-
+### Show logs
+````
+docker container logs container-rabbit-1
+````
