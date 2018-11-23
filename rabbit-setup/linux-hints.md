@@ -23,3 +23,19 @@ Alt + A   // -> starts selection - then move with cursor
 ````
 
 ---
+Find path of app with **which**. 
+E.g.:
+
+````which dotnet````
+
+````which docker````
+
+---
+
+**dpkg**
+
+- Install a deb: ````dpkg -i .\{mydeb}````
+- List all installed packages: ````dpkg -l ```` (use with | grep)
+- See the locations of all the files installed as part of the package:
+ ````dpkg -L <packagename>````
+
