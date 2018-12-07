@@ -1,31 +1,18 @@
-# tar
+# Install the .NET SDK
 
-### Create tar-file under Windows
-
-- Use ````SharpZipLib.NETStandard```` from ````ICSharpCode````
-- Snippet that creates an archive: 
+- Install .NET SDK for Ubuntu 16.4 (https://www.microsoft.com/net/learn/dotnet/hello-world-tutorial)
 
 ````
-Directory.SetCurrentDirectory(@"C:\Temp\MyFiles\");
-string[] files = { "A.txt" , "B.txt" , "C.txt" };
- 
-using (FileStream outStream = File.Create(@"C:\Temp\archive.tar"))
-{
-    TarArchive archive = TarArchive.CreateOutputTarArchive(outStream);
+wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
+sudo dpkg -i packages-microsoft-prod.deb
 
-    foreach (string file in files)
-    {
-        TarEntry entry = TarEntry.CreateEntryFromFile(file);
-        archive.WriteEntry(entry, true);
-    }
-
-    archive.Close();
-}
+sudo apt-get install apt-transport-https
+sudo apt-get update
+sudo apt-get install dotnet-sdk-2.1
 ````
+
+- Docu of dotnet CLI Tools: https://docs.microsoft.com/en-us/dotnet/core/tools/?tabs=netcore2x
+  - ````dotnet new console myApp````
+  - ````dotnet run myApp.csproj```` 
 
 ---
-
-#### Check tar under Linux
-- Check file-type under linux: ````file archive.tar````  (should return ````POSIX tar archive````)
-- List files in tar: ````tar -tvf archive.tar````
-- Extract files in tar: ````tar -xvf archive.tar````
