@@ -1,6 +1,12 @@
 # Hints for setting up new VM
 
+### Installation & Guest Additions
 
+- https://itsfoss.com/install-linux-in-virtualbox/
+- https://itsfoss.com/virtualbox-guest-additions-ubuntu/  
+  (if a minimal installation was chosen --> requires to add the missing packages)
+
+---
 ### Network
 Setup two network adapters: one for communication VM <-> Host, otder for VM <-> Internet.
 See [here](https://gist.github.com/pjdietz/5768124) for additional info.
@@ -16,8 +22,8 @@ See [here](https://gist.github.com/pjdietz/5768124) for additional info.
 
 ### Copy & Paste 
 Enable Copy & Paste:
-  Inside VM > Ger‰te > Gemeinsame Zwischenablage > Bi-Directional
-  Inside VM > Ger‰te > Gasterweiterungen einlegenÖ
+  Inside VM > Ger√§te > Gemeinsame Zwischenablage > Bi-Directional
+  Inside VM > Ger√§te > Gasterweiterungen einlegen‚Ä¶
 
 ---
 
@@ -30,6 +36,6 @@ Enable Copy & Paste:
 - Mount the shared folder to a directory of choice:
   - ````sudo mount -t vboxsf -o rw,uid=1000,gid=1000 myShare /home/mats/somedir```` where 'somedir' must exist
   - replace '1000' with values retrieved from running 'id'
-  - maybe add user to group vboxsf: ````sudo adduser [username] vboxsf```` (Background: When VirtualBox installed the Ubuntu operating system, it added a group called ìvboxsfî. Before you can access any shared folders, you must add yourself to the vboxsf group.)
+  - maybe add user to group vboxsf: ````sudo adduser [username] vboxsf```` (Background: When VirtualBox installed the Ubuntu operating system, it added a group called ‚Äúvboxsf‚Äù. Before you can access any shared folders, you must add yourself to the vboxsf group.)
   
 ---
